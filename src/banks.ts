@@ -3,6 +3,7 @@
 import { parseAmountCents } from "./helpers.js"
 import { Transaction } from "./types.js"
 import { createHash } from "crypto"
+import api from "@actual-app/api"
 
 // ── Bank adapters ─────────────────────────────────────────────────────────────
 //
@@ -89,6 +90,36 @@ export const banks = [
         }
 
         transactions.push(transaction)
+      }
+
+      return transactions
+    },
+  },
+  {
+    name: "traderepublic",
+    encoding: "utf-8",
+    parse(content: string): Transaction[] {
+      const transactions: Transaction[] = []
+      const input = JSON.parse(content)
+
+      for (const transaction of input) {
+        const amount = api.utils.amountToInteger(
+          parseFloat(transaction.amount.value)
+        )
+
+        // Card verifications are also transaction, but with an amount of 0
+        if (amount == 0) {
+          continue
+        }
+
+        transactions.push({
+          payee_name: transaction.title,
+          amount: amount,
+          date: transaction.timestamp.slice(0, 10),
+          notes: "",
+          account: "",
+          imported_id: transaction.id,
+        })
       }
 
       return transactions

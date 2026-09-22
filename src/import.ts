@@ -105,5 +105,6 @@ async function performImport(
     payeeNameNormalization: "original",
   })
 
+  await api.sync()
   await api.shutdown()
 }
