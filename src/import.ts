@@ -6,7 +6,6 @@ import { banks } from "./banks.js"
 import { Bank } from "./types.js"
 import fs from "fs"
 import { Transaction } from "./types.js"
-import { transcode } from "buffer"
 
 ;(async () => {
   const args = process.argv.slice(2)
