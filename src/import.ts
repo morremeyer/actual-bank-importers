@@ -52,7 +52,14 @@ import { Transaction } from "./types.js"
   }
 
   const transactions = parse(parser, file)
-  return performImport(budget, account, transactions)
+
+  await api.init({
+    dataDir: "data",
+    serverURL: process.env.SERVER_URL || "",
+    password: process.env.SERVER_PASSWORD || "",
+  })
+  await performImport(budget, account, transactions)
+  await api.shutdown()
 })()
 
 function parse(parser: Bank, file: string): Transaction[] {
@@ -68,12 +75,6 @@ async function performImport(
   accountName: string,
   transactions: Transaction[]
 ) {
-  await api.init({
-    dataDir: "data",
-    serverURL: process.env.SERVER_URL || "",
-    password: process.env.SERVER_PASSWORD || "",
-  })
-
   const budgets = await api.getBudgets()
 
   // Filter the budget list for the correct one, don't accept duplicates.
@@ -84,19 +85,20 @@ async function performImport(
   const budget = budgets.filter(b => b.name === budgetName && !b.id)
   if (budget.length === 0) {
     console.log("There is no budget with the name you specified")
-    return false
+    return
   } else if (budget.length > 1) {
     console.log("There are multiple budgets with the name you specified")
+    return
   }
 
   await api.downloadBudget(budget[0]!.groupId)
-  await api.sync()
 
   const accounts = await api.getAccounts()
   const account = accounts.find(a => a.name === accountName)
 
   if (account === undefined) {
-    return false
+    console.log("No account with this name exists")
+    return
   }
 
   await api.importTransactions(account.id, transactions, {
@@ -106,5 +108,4 @@ async function performImport(
   })
 
   await api.sync()
-  await api.shutdown()
 }
