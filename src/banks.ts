@@ -58,7 +58,7 @@ export const banks = [
         // Extract payee from Buchungstext
         let payee
         const senderMatch = buchungstext.match(
-          /(?:Auftraggeber|Empf[äÄ]nger):\s*(.+?)(?:\s{2,}|Kto\/IBAN|BLZ\/BIC|Buchungstext|$)/i
+          /(?:Auftraggeber|Empf[äÄ]nger):\s*(.+?)(?:\s{2,}|Kto\/IBAN|BLZ\/BIC|Buchungstext|Ref\.|$)/i
         )
         if (senderMatch) {
           payee = senderMatch[1]!.trim()

@@ -103,7 +103,7 @@ async function performImport(
 
   await api.importTransactions(account.id, transactions, {
     dryRun: false,
-    reimportDeleted: false,
+    reimportDeleted: true,
     payeeNameNormalization: "original",
   })
 
